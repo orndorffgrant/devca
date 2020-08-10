@@ -21,12 +21,12 @@ struct NewCommand {
     name: String,
 }
 
-fn run() -> Result<(), &'static str>{
+fn run() -> Result<(), &'static str> {
     let opts = Opts::parse();
     match opts.subcmd {
         SubCommand::New(n) => {
             commands::new_cert(&n.name)?;
-        },
+        }
     };
     Ok(())
 }
@@ -36,10 +36,10 @@ fn main() {
     match result {
         Ok(_) => {
             process::exit(0);
-        },
+        }
         Err(msg) => {
             eprintln!("{}", msg);
             process::exit(1);
-        },
+        }
     };
 }
