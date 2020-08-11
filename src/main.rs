@@ -1,4 +1,6 @@
+mod certs;
 mod commands;
+mod helpers;
 
 use clap::Clap;
 
@@ -21,7 +23,7 @@ struct NewCommand {
     name: String,
 }
 
-fn run() -> Result<(), &'static str> {
+fn run() -> Result<(), String> {
     let opts = Opts::parse();
     match opts.subcmd {
         SubCommand::New(n) => {
