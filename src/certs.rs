@@ -7,7 +7,6 @@ use openssl::nid::Nid;
 use openssl::pkey::{Private, PKey};
 use openssl::x509::{X509Builder, X509NameBuilder, X509Extension};
 
-// TODO also return pkey
 pub(crate) fn create_ca() -> Result<(Vec<u8>, Vec<u8>), String> {
     let mut builder = X509Builder::new().map_err(stringify)?;
 
@@ -51,7 +50,6 @@ pub(crate) fn create_ca() -> Result<(Vec<u8>, Vec<u8>), String> {
     Ok((ca_cert_pem, ca_key_pem))
 }
 
-// TODO take bytes instead for key. Reason: keep openssl encapsulated.
 pub(crate) fn create_cert(name: &str, ca_pkey_pem: &[u8]) -> Result<(Vec<u8>, Vec<u8>), String> {
     let ca_pkey = PKey::private_key_from_pem(ca_pkey_pem).map_err(stringify)?;
 
@@ -63,6 +61,7 @@ pub(crate) fn create_cert(name: &str, ca_pkey_pem: &[u8]) -> Result<(Vec<u8>, Ve
     let not_after = Asn1Time::days_from_now(1000).map_err(stringify)?;
     builder.set_not_after(&not_after).map_err(stringify)?;
 
+    // TODO keep track of serial number
     let serial_bn = BigNum::from_u32(1).map_err(stringify)?;
     let serial_number = Asn1Integer::from_bn(&serial_bn).map_err(stringify)?;
     builder.set_serial_number(&serial_number).map_err(stringify)?;
