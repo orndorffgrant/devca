@@ -8,7 +8,7 @@ use openssl::pkey::{Private, PKey};
 use openssl::x509::{X509Builder, X509NameBuilder, X509Extension};
 
 // TODO also return pkey
-pub(crate) fn create_ca() -> Result<Vec<u8>, String> {
+pub(crate) fn create_ca() -> Result<(Vec<u8>, Vec<u8>), String> {
     let mut builder = X509Builder::new().map_err(stringify)?;
 
     let not_before = Asn1Time::days_from_now(0).map_err(stringify)?;
@@ -46,12 +46,13 @@ pub(crate) fn create_ca() -> Result<Vec<u8>, String> {
     let ca_cert = builder.build();
 
     let ca_cert_pem = ca_cert.to_pem().map_err(stringify)?;
+    let ca_key_pem = ca_pkey.private_key_to_pem_pkcs8().map_err(stringify)?;
 
-    Ok(ca_cert_pem)
+    Ok((ca_cert_pem, ca_key_pem))
 }
 
 // TODO take bytes instead for key. Reason: keep openssl encapsulated.
-pub(crate) fn create_cert(name: &str, ca_pkey_pem: &[u8]) -> Result<Vec<u8>, String> {
+pub(crate) fn create_cert(name: &str, ca_pkey_pem: &[u8]) -> Result<(Vec<u8>, Vec<u8>), String> {
     let ca_pkey = PKey::private_key_from_pem(ca_pkey_pem).map_err(stringify)?;
 
     let mut builder = X509Builder::new().map_err(stringify)?;
@@ -87,9 +88,10 @@ pub(crate) fn create_cert(name: &str, ca_pkey_pem: &[u8]) -> Result<Vec<u8>, Str
 
     builder.sign(&ca_pkey, MessageDigest::sha512()).map_err(stringify)?;
 
-    let ca_cert = builder.build();
+    let cert = builder.build();
 
-    let ca_cert_pem = ca_cert.to_pem().map_err(stringify)?;
+    let cert_pem = cert.to_pem().map_err(stringify)?;
+    let key_pem = cert_pkey.private_key_to_pem_pkcs8().map_err(stringify)?;
 
-    Ok(ca_cert_pem)
+    Ok((cert_pem, key_pem))
 }

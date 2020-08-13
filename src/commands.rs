@@ -47,9 +47,8 @@ pub(crate) fn new_cert(name: &str) -> Result<(), String> {
     let cert_dir = cert_dir(name)?;
     // TODO check if CA exists
     // TODO create CA if doesn't exist
-    let ca_cert_pem = create_ca()?;
-    // TODO also return pkey
-    let cert_pem = create_cert(name, &ca_cert_pem)?;
+    let (ca_cert_pem, ca_key_pem) = create_ca()?;
+    let (cert_pem, cert_key_pem) = create_cert(name, &ca_key_pem)?;
 
     // TODO check if cert name exists
     // TODO prompt if cert name already exists
