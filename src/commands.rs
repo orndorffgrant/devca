@@ -1,46 +1,9 @@
 use crate::helpers::stringify;
 use crate::certs::{create_ca, create_cert};
+use crate::dirs::{ca_dir, cert_dir};
 
-use dirs::data_local_dir;
 use serde::{Serialize, Deserialize};
-use std::fs::{read, write, create_dir};
-use std::path::PathBuf;
-
-fn project_dir() -> Result<PathBuf, String> {
-    let mut dir = data_local_dir().ok_or("Cannot find data directory")?;
-    dir.push("devca");
-    if !dir.exists() {
-        create_dir(&dir).map_err(stringify)?;
-    }
-    Ok(dir)
-}
-
-fn ca_dir() -> Result<PathBuf, String> {
-    let mut dir = project_dir()?;
-    dir.push("ca");
-    if !dir.exists() {
-        create_dir(&dir).map_err(stringify)?;
-    }
-    Ok(dir)
-}
-
-fn certs_dir() -> Result<PathBuf, String> {
-    let mut dir = project_dir()?;
-    dir.push("certs");
-    if !dir.exists() {
-        create_dir(&dir).map_err(stringify)?;
-    }
-    Ok(dir)
-}
-
-fn cert_dir(name: &str) -> Result<PathBuf, String> {
-    let mut dir = certs_dir()?;
-    dir.push(name);
-    if !dir.exists() {
-        create_dir(&dir).map_err(stringify)?;
-    }
-    Ok(dir)
-}
+use std::fs::{read, write};
 
 fn get_ca_key() -> Result<Vec<u8>, String> {
     let mut key_path = ca_dir()?;

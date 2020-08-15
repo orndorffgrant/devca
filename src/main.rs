@@ -1,5 +1,6 @@
 mod certs;
 mod commands;
+mod dirs;
 mod helpers;
 
 use clap::Clap;
