@@ -1,7 +1,7 @@
 use crate::helpers::stringify;
 use dirs::data_local_dir;
 
-use std::fs::{create_dir};
+use std::fs::create_dir;
 use std::path::PathBuf;
 
 pub fn project_dir() -> Result<PathBuf, String> {

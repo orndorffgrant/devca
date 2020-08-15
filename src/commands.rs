@@ -1,8 +1,8 @@
-use crate::helpers::stringify;
 use crate::certs::{create_ca, create_cert};
 use crate::dirs::{ca_dir, cert_dir};
+use crate::helpers::stringify;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::fs::{read, write};
 
 fn get_ca_key() -> Result<Vec<u8>, String> {
@@ -27,7 +27,7 @@ fn get_ca_key() -> Result<Vec<u8>, String> {
 
 #[derive(Serialize, Deserialize)]
 struct CAState {
-    serial_number: u32
+    serial_number: u32,
 }
 
 fn get_ca_state() -> Result<CAState, String> {
@@ -38,7 +38,7 @@ fn get_ca_state() -> Result<CAState, String> {
             let raw_ca_state = read(&ca_state_path).map_err(stringify)?;
             serde_json::from_slice(&raw_ca_state).map_err(stringify)?
         } else {
-            CAState{ serial_number: 0 }
+            CAState { serial_number: 0 }
         }
     };
 
@@ -66,7 +66,15 @@ pub(crate) fn new_cert(name: &str) -> Result<(), String> {
     write(&key_path, &key_pem).map_err(stringify)?;
     write(&cert_path, &cert_pem).map_err(stringify)?;
 
-    println!("Created private key for \"{}\": {}", name, key_path.to_str().unwrap());
-    println!("Created certificate for \"{}\": {}", name, cert_path.to_str().unwrap());
+    println!(
+        "Created private key for \"{}\": {}",
+        name,
+        key_path.to_str().unwrap()
+    );
+    println!(
+        "Created certificate for \"{}\": {}",
+        name,
+        cert_path.to_str().unwrap()
+    );
     Ok(())
 }
