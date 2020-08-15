@@ -4,7 +4,7 @@ use openssl::bn::BigNum;
 use openssl::ec::{EcKey, EcGroup};
 use openssl::hash::MessageDigest;
 use openssl::nid::Nid;
-use openssl::pkey::{Private, PKey};
+use openssl::pkey::{PKey};
 use openssl::x509::{X509Builder, X509NameBuilder, X509Extension};
 
 pub(crate) fn create_ca() -> Result<(Vec<u8>, Vec<u8>), String> {
@@ -19,6 +19,11 @@ pub(crate) fn create_ca() -> Result<(Vec<u8>, Vec<u8>), String> {
     let serial_bn = BigNum::from_u32(1).map_err(stringify)?;
     let serial_number = Asn1Integer::from_bn(&serial_bn).map_err(stringify)?;
     builder.set_serial_number(&serial_number).map_err(stringify)?;
+
+    let mut issuer_name_builder = X509NameBuilder::new().map_err(stringify)?;
+    issuer_name_builder.append_entry_by_text("CN", "DevCA").map_err(stringify)?;
+    let issuer_name = issuer_name_builder.build();
+    builder.set_issuer_name(&issuer_name).map_err(stringify)?;
 
     let mut subject_name_builder = X509NameBuilder::new().map_err(stringify)?;
     subject_name_builder.append_entry_by_text("CN", "DevCA").map_err(stringify)?;
@@ -50,7 +55,7 @@ pub(crate) fn create_ca() -> Result<(Vec<u8>, Vec<u8>), String> {
     Ok((ca_cert_pem, ca_key_pem))
 }
 
-pub(crate) fn create_cert(name: &str, ca_pkey_pem: &[u8]) -> Result<(Vec<u8>, Vec<u8>), String> {
+pub(crate) fn create_cert(name: &str, ca_pkey_pem: &[u8], serial_no: u32) -> Result<(Vec<u8>, Vec<u8>), String> {
     let ca_pkey = PKey::private_key_from_pem(ca_pkey_pem).map_err(stringify)?;
 
     let mut builder = X509Builder::new().map_err(stringify)?;
@@ -61,10 +66,14 @@ pub(crate) fn create_cert(name: &str, ca_pkey_pem: &[u8]) -> Result<(Vec<u8>, Ve
     let not_after = Asn1Time::days_from_now(1000).map_err(stringify)?;
     builder.set_not_after(&not_after).map_err(stringify)?;
 
-    // TODO keep track of serial number
-    let serial_bn = BigNum::from_u32(1).map_err(stringify)?;
+    let serial_bn = BigNum::from_u32(serial_no).map_err(stringify)?;
     let serial_number = Asn1Integer::from_bn(&serial_bn).map_err(stringify)?;
     builder.set_serial_number(&serial_number).map_err(stringify)?;
+
+    let mut issuer_name_builder = X509NameBuilder::new().map_err(stringify)?;
+    issuer_name_builder.append_entry_by_text("CN", "DevCA").map_err(stringify)?;
+    let issuer_name = issuer_name_builder.build();
+    builder.set_issuer_name(&issuer_name).map_err(stringify)?;
 
     let mut subject_name_builder = X509NameBuilder::new().map_err(stringify)?;
     subject_name_builder.append_entry_by_text("CN", name).map_err(stringify)?;
