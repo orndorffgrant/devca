@@ -4,6 +4,8 @@ use crate::helpers::stringify;
 
 use serde::{Deserialize, Serialize};
 use std::fs::{read, write};
+use std::io;
+use std::io::prelude::*;
 
 fn get_ca_key() -> Result<Vec<u8>, String> {
     let mut key_path = ca_dir()?;
@@ -60,8 +62,16 @@ pub(crate) fn new_cert(name: &str) -> Result<(), String> {
     key_path.push("key.pem");
     cert_path.push("cert.pem");
 
-    // TODO check if cert name exists
-    // TODO prompt if cert name already exists
+    if key_path.exists() {
+        print!("**** A certificate for \"localhost\" already exists. Would you like to overwrite it? y/N: ");
+        io::stdout().flush().map_err(stringify)?;
+        let mut answer = String::new();
+        io::stdin().read_line(&mut answer).map_err(stringify)?;
+        if answer.to_ascii_lowercase().chars().nth(0) != Some('y') {
+            return Ok(());
+        }
+    }
+
     let (cert_pem, key_pem) = create_cert(name, &ca_key_pem, ca_state.serial_number)?;
     write(&key_path, &key_pem).map_err(stringify)?;
     write(&cert_path, &cert_pem).map_err(stringify)?;
