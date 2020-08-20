@@ -26,10 +26,10 @@ devca new <name>
 
 ```
 $ devca new localhost
-Created certificate authority private key: /home/grant/.local/devca/ca/key.pem
-Created certificate authority certificate: /home/grant/.local/devca/ca/cert.pem
-Created private key for "localhost": /home/grant/.local/devca/hosts/localhost/key.pem
-Created certificate for "localhost": /home/grant/.local/devca/hosts/localhost/cert.pem
+Created certificate authority private key: /home/grant/.local/share/devca/ca/key.pem
+Created certificate authority certificate: /home/grant/.local/share/devca/ca/cert.pem
+Created private key for "localhost": /home/grant/.local/share/devca/certs/localhost/key.pem
+Created certificate for "localhost": /home/grant/.local/share/devca/certs/localhost/cert.pem
 ```
 
 The above is an example of what to expect when creating a certificate for the first time. `devca` will notice that it hasn't created a CA yet and generate it. It will then use the new CA to sign a new certificate for the name requested.
@@ -38,8 +38,8 @@ Subsequent runs will not require generating the CA, but will reuse the one it ha
 
 ```
 $ devca new mydevwebsite.local
-Created private key for "mydevwebsite.local": /home/grant/.local/devca/hosts/mydevwebsite.local/key.pem
-Created certificate for "mydevwebsite.local": /home/grant/.local/devca/hosts/mydevwebsite.local/cert.pem
+Created private key for "mydevwebsite.local": /home/grant/.local/share/devca/certs/mydevwebsite.local/key.pem
+Created certificate for "mydevwebsite.local": /home/grant/.local/share/devca/certs/mydevwebsite.local/cert.pem
 ```
 
 Requesting a cert for a name that already has a cert will require confirming your action, and then it will overwrite the existing cert with a new one.
@@ -47,8 +47,8 @@ Requesting a cert for a name that already has a cert will require confirming you
 ```
 $ devca new localhost
 **** A certificate for "localhost" already exists. Would you like to overwrite it? y/N: y
-Created private key for "localhost": /home/grant/.local/devca/hosts/localhost/key.pem
-Created certificate for "localhost": /home/grant/.local/devca/hosts/localhost/cert.pem
+Created private key for "localhost": /home/grant/.local/share/devca/certs/localhost/key.pem
+Created certificate for "localhost": /home/grant/.local/share/devca/certs/localhost/cert.pem
 ```
 
 ### `ls` command
