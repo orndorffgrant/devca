@@ -53,7 +53,21 @@ Created certificate for "localhost": /home/grant/.local/share/devca/certs/localh
 
 ### `ls` command
 
-Coming soon...
+`devca ls` lists all of your generated certs by name.
+
+#### Usage
+
+```
+devca ls
+```
+
+#### Example
+
+```
+$ devca ls
+localhost
+mydevwebsite.local
+```
 
 ### `pwd` command
 

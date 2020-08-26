@@ -1,5 +1,5 @@
 use crate::certs::{create_ca, create_cert};
-use crate::dirs::{ca_dir, cert_dir};
+use crate::dirs::{ca_dir, cert_dir, certs_dir};
 use crate::helpers::stringify;
 
 use serde::{Deserialize, Serialize};
@@ -86,5 +86,31 @@ pub(crate) fn new_cert(name: &str) -> Result<(), String> {
         name,
         cert_path.to_str().unwrap()
     );
+    Ok(())
+}
+
+pub(crate) fn ls() -> Result<(), String> {
+    let dir = certs_dir()?;
+    let dir_iterator = dir.read_dir().map_err(stringify)?;
+    for cert_dir in dir_iterator {
+        let cert_dir = cert_dir.map_err(stringify)?;
+        let cert_dir_path = cert_dir.path();
+
+        let mut cert_dir_key_path = cert_dir_path.clone();
+        let mut cert_dir_cert_path = cert_dir_path.clone();
+        cert_dir_key_path.push("key.pem");
+        cert_dir_cert_path.push("cert.pem");
+
+        if cert_dir_key_path.exists() && cert_dir_cert_path.exists() {
+            let cert_name_os = cert_dir_path
+                .file_name()
+                .ok_or("error getting directory name")?;
+            let cert_name = cert_name_os
+                .to_str()
+                .ok_or("error converting directory name")?;
+
+            println!("{}", cert_name);
+        }
+    }
     Ok(())
 }
