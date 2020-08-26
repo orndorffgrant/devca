@@ -17,6 +17,7 @@ struct Opts {
 #[derive(Clap)]
 enum SubCommand {
     New(NewCommand),
+    Ls,
 }
 
 #[derive(Clap)]
@@ -29,6 +30,9 @@ fn run() -> Result<(), String> {
     match opts.subcmd {
         SubCommand::New(n) => {
             commands::new_cert(&n.name)?;
+        }
+        SubCommand::Ls => {
+            commands::ls()?;
         }
     };
     Ok(())
