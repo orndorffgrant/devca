@@ -69,9 +69,30 @@ localhost
 mydevwebsite.local
 ```
 
-### `pwd` command
+### `path-to` command
 
-Coming soon...
+`devca path-to` outputs the directory of a particular certificate/key.
+
+#### Usage
+
+```
+devca path-to <name>
+```
+
+#### Examples
+
+```
+$ devca path-to localhost
+/home/grant/.local/share/devca/certs/localhost
+```
+
+If the cert doesn't exist, nothing will be printed to `stdout` and `devca` will exit with a non-zero exit code.
+
+You can use this instead of memorizing the location of the certs and keys themselves. For example, when using `npx serve`:
+
+```bash
+npx serve --ssl-cert $(devca path-to localhost)/cert.pem --ssl-key $(devca path-to localhost)/key.pem ./website
+```
 
 ### `ln` command?
 

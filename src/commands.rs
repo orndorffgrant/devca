@@ -114,3 +114,17 @@ pub(crate) fn ls() -> Result<(), String> {
     }
     Ok(())
 }
+
+pub(crate) fn path_to(name: &str) -> Result<(), String> {
+    let mut dir = certs_dir()?;
+    dir.push(name);
+    if dir.exists() {
+        println!("{}", dir.to_str().ok_or("error converting directory name")?);
+        Ok(())
+    } else {
+        Err(format!(
+            "Cert with that name has not been created. Create it with \"devca new {}\"",
+            name
+        ))
+    }
+}

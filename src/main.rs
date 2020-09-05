@@ -18,10 +18,16 @@ struct Opts {
 enum SubCommand {
     New(NewCommand),
     Ls,
+    PathTo(PathToCommand),
 }
 
 #[derive(Clap)]
 struct NewCommand {
+    name: String,
+}
+
+#[derive(Clap)]
+struct PathToCommand {
     name: String,
 }
 
@@ -33,6 +39,9 @@ fn run() -> Result<(), String> {
         }
         SubCommand::Ls => {
             commands::ls()?;
+        }
+        SubCommand::PathTo(p) => {
+            commands::path_to(&p.name)?;
         }
     };
     Ok(())
