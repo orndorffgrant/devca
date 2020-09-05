@@ -20,6 +20,7 @@ enum SubCommand {
     Ls,
     PathTo(PathToCommand),
     Delete(DeleteCommand),
+    Regen,
 }
 
 #[derive(Clap)]
@@ -41,7 +42,7 @@ fn run() -> Result<(), String> {
     let opts = Opts::parse();
     match opts.subcmd {
         SubCommand::New(n) => {
-            commands::new_cert(&n.name)?;
+            commands::new_cert(&n.name, false)?;
         }
         SubCommand::Ls => {
             commands::ls()?;
@@ -51,6 +52,9 @@ fn run() -> Result<(), String> {
         }
         SubCommand::Delete(d) => {
             commands::delete(&d.name)?;
+        }
+        SubCommand::Regen => {
+            commands::regen()?;
         }
     };
     Ok(())

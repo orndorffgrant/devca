@@ -7,21 +7,21 @@ use std::fs::{read, remove_dir_all, write};
 use std::io;
 use std::io::prelude::*;
 
-fn get_ca_key() -> Result<Vec<u8>, String> {
+fn get_ca_key(force_create_new: bool) -> Result<Vec<u8>, String> {
     let mut key_path = ca_dir()?;
     let mut cert_path = key_path.clone();
     key_path.push("key.pem");
     cert_path.push("cert.pem");
     let key_pem = {
-        if key_path.exists() {
-            read(key_path).map_err(stringify)?
-        } else {
+        if !key_path.exists() || force_create_new {
             let (ca_cert_pem, ca_key_pem) = create_ca()?;
             write(&key_path, &ca_key_pem).map_err(stringify)?;
             write(&cert_path, &ca_cert_pem).map_err(stringify)?;
             println!("Created CA private key: {}", key_path.to_str().unwrap());
             println!("Created CA certificate: {}", cert_path.to_str().unwrap());
             ca_key_pem
+        } else {
+            read(key_path).map_err(stringify)?
         }
     };
     Ok(key_pem)
@@ -53,8 +53,35 @@ fn get_ca_state() -> Result<CAState, String> {
     Ok(curr_ca_state)
 }
 
-pub(crate) fn new_cert(name: &str) -> Result<(), String> {
-    let ca_key_pem = get_ca_key()?;
+fn get_cert_list() -> Result<Vec<String>, String> {
+    let mut cert_list = vec![];
+    let dir = certs_dir()?;
+    let dir_iterator = dir.read_dir().map_err(stringify)?;
+    for cert_dir in dir_iterator {
+        let cert_dir = cert_dir.map_err(stringify)?;
+        let cert_dir_path = cert_dir.path();
+
+        let mut cert_dir_key_path = cert_dir_path.clone();
+        let mut cert_dir_cert_path = cert_dir_path.clone();
+        cert_dir_key_path.push("key.pem");
+        cert_dir_cert_path.push("cert.pem");
+
+        if cert_dir_key_path.exists() && cert_dir_cert_path.exists() {
+            let cert_name_os = cert_dir_path
+                .file_name()
+                .ok_or("error getting directory name")?;
+            let cert_name = cert_name_os
+                .to_str()
+                .ok_or("error converting directory name")?
+                .to_owned();
+            cert_list.push(cert_name);
+        }
+    }
+    Ok(cert_list)
+}
+
+pub(crate) fn new_cert(name: &str, force_overwrite: bool) -> Result<(), String> {
+    let ca_key_pem = get_ca_key(false)?;
     let ca_state = get_ca_state()?;
 
     let mut key_path = cert_dir(name)?;
@@ -62,7 +89,7 @@ pub(crate) fn new_cert(name: &str) -> Result<(), String> {
     key_path.push("key.pem");
     cert_path.push("cert.pem");
 
-    if key_path.exists() {
+    if key_path.exists() && !force_overwrite {
         print!("{}", format!("**** A certificate for \"{}\" already exists. Would you like to overwrite it? y/N: ", name));
         io::stdout().flush().map_err(stringify)?;
         let mut answer = String::new();
@@ -91,27 +118,9 @@ pub(crate) fn new_cert(name: &str) -> Result<(), String> {
 }
 
 pub(crate) fn ls() -> Result<(), String> {
-    let dir = certs_dir()?;
-    let dir_iterator = dir.read_dir().map_err(stringify)?;
-    for cert_dir in dir_iterator {
-        let cert_dir = cert_dir.map_err(stringify)?;
-        let cert_dir_path = cert_dir.path();
-
-        let mut cert_dir_key_path = cert_dir_path.clone();
-        let mut cert_dir_cert_path = cert_dir_path.clone();
-        cert_dir_key_path.push("key.pem");
-        cert_dir_cert_path.push("cert.pem");
-
-        if cert_dir_key_path.exists() && cert_dir_cert_path.exists() {
-            let cert_name_os = cert_dir_path
-                .file_name()
-                .ok_or("error getting directory name")?;
-            let cert_name = cert_name_os
-                .to_str()
-                .ok_or("error converting directory name")?;
-
-            println!("{}", cert_name);
-        }
+    let cert_list = get_cert_list()?;
+    for cert_name in cert_list {
+        println!("{}", cert_name);
     }
     Ok(())
 }
@@ -156,4 +165,24 @@ pub(crate) fn delete(name: &str) -> Result<(), String> {
     } else {
         Err("Certificate with that name does not exist. Nothing was deleted.".to_string())
     }
+}
+
+pub(crate) fn regen() -> Result<(), String> {
+    println!("**** This will regenerate the CA and all certificates.");
+    print!("**** Would you like to proceed? Y/n: ");
+    io::stdout().flush().map_err(stringify)?;
+    let mut answer = String::new();
+    io::stdin().read_line(&mut answer).map_err(stringify)?;
+    if answer.to_ascii_lowercase().chars().nth(0) == Some('n') {
+        println!("Aborting. Nothing was deleted or created.");
+        return Ok(());
+    }
+
+    let _ca_key_pem = get_ca_key(true)?;
+    let cert_list = get_cert_list()?;
+    for cert_name in cert_list {
+        new_cert(&cert_name, true)?;
+    }
+
+    Ok(())
 }
