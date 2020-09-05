@@ -19,6 +19,7 @@ enum SubCommand {
     New(NewCommand),
     Ls,
     PathTo(PathToCommand),
+    Delete(DeleteCommand),
 }
 
 #[derive(Clap)]
@@ -28,6 +29,11 @@ struct NewCommand {
 
 #[derive(Clap)]
 struct PathToCommand {
+    name: String,
+}
+
+#[derive(Clap)]
+struct DeleteCommand {
     name: String,
 }
 
@@ -42,6 +48,9 @@ fn run() -> Result<(), String> {
         }
         SubCommand::PathTo(p) => {
             commands::path_to(&p.name)?;
+        }
+        SubCommand::Delete(d) => {
+            commands::delete(&d.name)?;
         }
     };
     Ok(())

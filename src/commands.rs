@@ -3,7 +3,7 @@ use crate::dirs::{ca_dir, cert_dir, certs_dir};
 use crate::helpers::stringify;
 
 use serde::{Deserialize, Serialize};
-use std::fs::{read, write};
+use std::fs::{read, remove_dir_all, write};
 use std::io;
 use std::io::prelude::*;
 
@@ -123,8 +123,36 @@ pub(crate) fn path_to(name: &str) -> Result<(), String> {
         Ok(())
     } else {
         Err(format!(
-            "Cert with that name has not been created. Create it with \"devca new {}\"",
+            "Certificate with that name has not been created. Create it with \"devca new {}\"",
             name
         ))
+    }
+}
+
+pub(crate) fn delete(name: &str) -> Result<(), String> {
+    let mut dir = certs_dir()?;
+    dir.push(name);
+    if dir.exists() {
+        let dir_str = dir
+            .to_str()
+            .ok_or("error converting directory name")?
+            .to_owned();
+        println!(
+            "{}",
+            format!("**** This will delete all contents of {}", dir_str)
+        );
+        print!("**** Would you like to proceed? Y/n: ");
+        io::stdout().flush().map_err(stringify)?;
+        let mut answer = String::new();
+        io::stdin().read_line(&mut answer).map_err(stringify)?;
+        if answer.to_ascii_lowercase().chars().nth(0) == Some('n') {
+            println!("Aborting. Nothing was deleted.");
+            return Ok(());
+        }
+        remove_dir_all(dir).map_err(stringify)?;
+        println!("{}", format!("Deleted \"{}\": {}", name, dir_str));
+        Ok(())
+    } else {
+        Err("Certificate with that name does not exist. Nothing was deleted.".to_string())
     }
 }
