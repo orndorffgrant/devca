@@ -94,13 +94,33 @@ You can use this instead of memorizing the location of the certs and keys themse
 npx serve --ssl-cert $(devca path-to localhost)/cert.pem --ssl-key $(devca path-to localhost)/key.pem ./website
 ```
 
-### `ln` command?
+### `delete` command
 
-Coming soon...
+`devca delete` deletes a previously generated certificate/key pair.
 
-### `rm` command
+#### Usage
 
-Coming soon...
+```
+devca delete <name>
+```
+
+#### Examples
+
+This command is destructive, so it will present the directory it needs to delete and ask before completion. To cancel, type `n` and press Enter, or hit Ctrl-C.
+
+```
+$ devca delete localhost
+**** This will delete all contents of /home/grant/.local/share/devca/certs/localhost
+**** Would you like to proceed? Y/n:
+Deleted "localhost": /home/grant/.local/share/devca/certs/localhost
+```
+
+```
+$ devca delete localhost
+**** This will delete all contents of /home/grant/.local/share/devca/certs/localhost
+**** Would you like to proceed? Y/n: n
+Aborting. Nothing was deleted.
+```
 
 ### `regen` command
 
