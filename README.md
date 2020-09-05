@@ -10,6 +10,27 @@
 
 `devca` is not designed to be used as anything other than a development certificate authority. It should not be used for managing a real certificate authority. All certificates generated using this tool should be kept private. Most importantly, DO NOT share the CA certificate that you install in your browser with anyone. If an attacker got hold of your development CA, they would be able to impersonate any website to you over HTTPS.
 
+## Installation
+
+No prebuilt binaries are currently available, but building from source is fairly straightforward.
+
+First, if you don't already have it, install stable rust using the recommended instructions on the rust website: https://www.rust-lang.org/tools/install. This should install `cargo` as well.
+
+Next, clone the repository and enter the directory in your shell.
+
+```
+git clone https://github.com/orndorffgrant/devca.git
+cd devca
+```
+
+Build and install devca using `cargo`. Note that you will need a C compiler, perl, and make for the openssl compilation to succeed.
+
+```
+cargo install --path .
+```
+
+Make sure `$HOME/.cargo/bin` is in your `$PATH` and you should be able to use `devca` from your shell.
+
 ## Usage
 
 ### `new` command
