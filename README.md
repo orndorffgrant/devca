@@ -105,3 +105,7 @@ Coming soon...
 ### `regen` command
 
 Coming soon...
+
+## Prior Art
+
+`devca` was inspired by [`minica`](https://github.com/jsha/minica)
