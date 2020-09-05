@@ -1,4 +1,4 @@
-# DevCA (WIP)
+# DevCA
 
 `devca` is a command to easily generate certificates for local TLS services during development. Client applications, particularly browsers, behave differently when connecting to plaintext services (like HTTP) compared to secure services (like HTTPS). By creating certificates for your local in-development services, you can develop your services in a more similar environment to a real deployment.
 
