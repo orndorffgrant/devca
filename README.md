@@ -145,7 +145,36 @@ Aborting. Nothing was deleted.
 
 ### `regen` command
 
-Coming soon...
+`devca regen` regenerates your CA and all of your certificates/keys.
+
+#### Usage
+
+```
+devca regen
+```
+
+#### Examples
+
+This command is destructive, so it will confirm before continuing. To cancel, type `n` and press Enter, or hit Ctrl-C.
+
+```
+$ devca regen
+**** This will regenerate the CA and all certificates.
+**** Would you like to proceed? Y/n:
+Created CA private key: /home/grant/.local/share/devca/ca/key.pem
+Created CA certificate: /home/grant/.local/share/devca/ca/cert.pem
+Created private key for "mydevwebsite.local": /home/grant/.local/share/devca/certs/mydevwebsite.local/key.pem
+Created certificate for "mydevwebsite.local": /home/grant/.local/share/devca/certs/mydevwebsite.local/cert.pem
+Created private key for "localhost": /home/grant/.local/share/devca/certs/localhost/key.pem
+Created certificate for "localhost": /home/grant/.local/share/devca/certs/localhost/cert.pem
+```
+
+```
+$ devca regen
+**** This will regenerate the CA and all certificates.
+**** Would you like to proceed? Y/n: n
+Aborting. Nothing was deleted or created.
+```
 
 ## Prior Art
 
