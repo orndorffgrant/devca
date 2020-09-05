@@ -109,3 +109,9 @@ Coming soon...
 ## Prior Art
 
 `devca` was inspired by [`minica`](https://github.com/jsha/minica)
+
+## Licensing
+
+DevCA is licensed under the [MIT License](./LICENSE).
+
+OpenSSL is included in distributions of DevCA; it's license can be found in [THIRD_PARTY_LICENSES](./THIRD_PARTY_LICENSES).
