@@ -63,11 +63,12 @@ pub(crate) fn new_cert(name: &str) -> Result<(), String> {
     cert_path.push("cert.pem");
 
     if key_path.exists() {
-        print!("**** A certificate for \"localhost\" already exists. Would you like to overwrite it? y/N: ");
+        print!("{}", format!("**** A certificate for \"{}\" already exists. Would you like to overwrite it? y/N: ", name));
         io::stdout().flush().map_err(stringify)?;
         let mut answer = String::new();
         io::stdin().read_line(&mut answer).map_err(stringify)?;
         if answer.to_ascii_lowercase().chars().nth(0) != Some('y') {
+            println!("Aborting. Nothing was created.");
             return Ok(());
         }
     }
