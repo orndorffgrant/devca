@@ -12,7 +12,40 @@
 
 ## Installation
 
-No prebuilt binaries are currently available, but building from source is fairly straightforward.
+### Pre-built WebAssembly Binary
+
+WebAssembly builds are included in each [release](https://github.com/orndorffgrant/devca/releases/latest).
+
+WebAssembly binaries require a runtime like [`wasmtime`](https://github.com/bytecodealliance/wasmtime) or [`wasmer`](https://github.com/wasmerio/wasmer/). The instructions here assume you have `wasmtime` installed, but can be adapted to any WebAssembly runtime that supports WASI.
+
+`wasmtime` and other runtimes run wasm in a sandbox, so you need to explicitly allow access to environment variables and directories. It's recommended that you set up an alias to do this for you as shown below.
+
+First, download the `devca.wasm` binary from the latest release.
+
+Move the binary to a sensible location and create a directory for `devca` to put certs in (this will become `$DEVCA_HOME` in the next step)
+```bash
+mkdir ~/.wasm_bin
+mv ~/Downloads/devca.wasm ~/.wasm_bin/devca
+
+mkdir ~/.devca
+```
+
+In your shell startup script, set the `$DEVCA_HOME` environment variable and set up an alias for `devca`. If you use `bash`, add the following to your `~/.bashrc`.
+```bash
+export DEVCA_HOME=$HOME/.devca
+alias devca="wasmtime run --env DEVCA_HOME=$DEVCA_HOME --dir $DEVCA_HOME $HOME/.wasm_bin/devca --"
+```
+
+Restart your shell and you'll have access to the `devca` command!
+
+```bash
+exec bash
+devca --version
+```
+
+### Build from Source
+
+If you don't trust the sandboxed pre-built WebAssembly binary, or if you need native performance, you can build `devca` from source.
 
 First, if you don't already have it, install stable rust using the recommended instructions on the rust website: https://www.rust-lang.org/tools/install. This should install `cargo` as well.
 
