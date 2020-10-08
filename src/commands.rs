@@ -2,7 +2,6 @@ use crate::certs::{create_ca, create_cert};
 use crate::dirs::{ca_dir, cert_dir, certs_dir};
 use crate::helpers::stringify;
 
-use serde::{Deserialize, Serialize};
 use std::fs::{read, remove_dir_all, write};
 use std::io;
 use std::io::prelude::*;
@@ -27,32 +26,6 @@ fn get_ca(force_create_new: bool) -> Result<(Vec<u8>, Vec<u8>), String> {
         }
     };
     Ok(pems)
-}
-
-#[derive(Serialize, Deserialize)]
-struct CAState {
-    serial_number: u32,
-}
-
-fn get_ca_state() -> Result<CAState, String> {
-    let mut ca_state_path = ca_dir()?;
-    ca_state_path.push("state.json");
-    let mut curr_ca_state = {
-        if ca_state_path.exists() {
-            let raw_ca_state = read(&ca_state_path).map_err(stringify)?;
-            serde_json::from_slice(&raw_ca_state).map_err(stringify)?
-        } else {
-            CAState { serial_number: 0 }
-        }
-    };
-
-    curr_ca_state.serial_number += 1;
-
-    let serialized_ca_state = serde_json::to_vec(&curr_ca_state).map_err(stringify)?;
-
-    write(&ca_state_path, serialized_ca_state).map_err(stringify)?;
-
-    Ok(curr_ca_state)
 }
 
 fn get_cert_list() -> Result<Vec<String>, String> {
@@ -84,7 +57,6 @@ fn get_cert_list() -> Result<Vec<String>, String> {
 
 pub(crate) fn new_cert(name: &str, force_overwrite: bool) -> Result<(), String> {
     let (ca_cert_pem, ca_key_pem) = get_ca(false)?;
-    let ca_state = get_ca_state()?;
 
     let mut key_path = cert_dir(name)?;
     let mut cert_path = key_path.clone();
@@ -102,7 +74,7 @@ pub(crate) fn new_cert(name: &str, force_overwrite: bool) -> Result<(), String> 
         }
     }
 
-    let (cert_pem, key_pem) = create_cert(name, &ca_cert_pem, &ca_key_pem, ca_state.serial_number)?;
+    let (cert_pem, key_pem) = create_cert(name, &ca_cert_pem, &ca_key_pem)?;
     write(&key_path, &key_pem).map_err(stringify)?;
     write(&cert_path, &cert_pem).map_err(stringify)?;
 

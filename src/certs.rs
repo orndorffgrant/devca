@@ -67,7 +67,6 @@ pub(crate) fn create_cert(
     name: &str,
     ca_cert_pem: &[u8],
     ca_pkey_pem: &[u8],
-    serial_no: u32,
 ) -> Result<(Vec<u8>, Vec<u8>), String> {
     let ca_pkey_pem_string = String::from_utf8(ca_pkey_pem.to_vec()).unwrap();
     let ca_key = PrivateKey::from_pem_str(&ca_pkey_pem_string).unwrap();
