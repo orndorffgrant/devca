@@ -7,24 +7,26 @@ use std::fs::{read, remove_dir_all, write};
 use std::io;
 use std::io::prelude::*;
 
-fn get_ca_key(force_create_new: bool) -> Result<Vec<u8>, String> {
+fn get_ca(force_create_new: bool) -> Result<(Vec<u8>, Vec<u8>), String> {
     let mut key_path = ca_dir()?;
     let mut cert_path = key_path.clone();
     key_path.push("key.pem");
     cert_path.push("cert.pem");
-    let key_pem = {
+    let pems = {
         if !key_path.exists() || force_create_new {
             let (ca_cert_pem, ca_key_pem) = create_ca()?;
             write(&key_path, &ca_key_pem).map_err(stringify)?;
             write(&cert_path, &ca_cert_pem).map_err(stringify)?;
             println!("Created CA private key: {}", key_path.to_str().unwrap());
             println!("Created CA certificate: {}", cert_path.to_str().unwrap());
-            ca_key_pem
+            (ca_cert_pem, ca_key_pem)
         } else {
-            read(key_path).map_err(stringify)?
+            let ca_key_pem = read(key_path).map_err(stringify)?;
+            let ca_cert_pem = read(cert_path).map_err(stringify)?;
+            (ca_cert_pem, ca_key_pem)
         }
     };
-    Ok(key_pem)
+    Ok(pems)
 }
 
 #[derive(Serialize, Deserialize)]
@@ -81,7 +83,7 @@ fn get_cert_list() -> Result<Vec<String>, String> {
 }
 
 pub(crate) fn new_cert(name: &str, force_overwrite: bool) -> Result<(), String> {
-    let ca_key_pem = get_ca_key(false)?;
+    let (ca_cert_pem, ca_key_pem) = get_ca(false)?;
     let ca_state = get_ca_state()?;
 
     let mut key_path = cert_dir(name)?;
@@ -100,7 +102,7 @@ pub(crate) fn new_cert(name: &str, force_overwrite: bool) -> Result<(), String> 
         }
     }
 
-    let (cert_pem, key_pem) = create_cert(name, &ca_key_pem, ca_state.serial_number)?;
+    let (cert_pem, key_pem) = create_cert(name, &ca_cert_pem, &ca_key_pem, ca_state.serial_number)?;
     write(&key_path, &key_pem).map_err(stringify)?;
     write(&cert_path, &cert_pem).map_err(stringify)?;
 
@@ -178,7 +180,7 @@ pub(crate) fn regen() -> Result<(), String> {
         return Ok(());
     }
 
-    let _ca_key_pem = get_ca_key(true)?;
+    let _ca_pems = get_ca(true)?;
     let cert_list = get_cert_list()?;
     for cert_name in cert_list {
         new_cert(&cert_name, true)?;
