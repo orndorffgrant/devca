@@ -8,7 +8,7 @@ use clap::Clap;
 use std::process;
 
 #[derive(Clap)]
-#[clap(version = "0.1.0")]
+#[clap(version = "0.2.0")]
 struct Opts {
     #[clap(subcommand)]
     subcmd: SubCommand,
