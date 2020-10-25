@@ -125,12 +125,12 @@ mydevwebsite.local
 
 ### `path-to` command
 
-`devca path-to` outputs the directory of a particular certificate/key.
+`devca path-to` outputs the directory of a particular certificate/key or the absolute path of the certificate/key itself.
 
 #### Usage
 
 ```
-devca path-to <name>
+devca path-to <name> [--cert|--key]
 ```
 
 #### Examples
@@ -138,14 +138,28 @@ devca path-to <name>
 ```
 $ devca path-to localhost
 /home/grant/.local/share/devca/certs/localhost
+
+$ devca path-to localhost --cert
+/home/grant/.local/share/devca/certs/localhost/cert.pem
+
+$ devca path-to localhost --key
+/home/grant/.local/share/devca/certs/localhost/key.pem
 ```
+
 
 If the cert doesn't exist, nothing will be printed to `stdout` and `devca` will exit with a non-zero exit code.
 
 You can use this instead of memorizing the location of the certs and keys themselves. For example, when using `npx serve`:
 
 ```bash
-npx serve --ssl-cert $(devca path-to localhost)/cert.pem --ssl-key $(devca path-to localhost)/key.pem ./website
+npx serve --ssl-cert $(devca path-to localhost --cert) --ssl-key $(devca path-to localhost --key) ./website
+```
+
+`ca` is a special value for this command and can be used to output location of the CA cert.
+
+```
+$ devca path-to ca --cert
+/home/grant/.local/share/devca/ca/cert.pem
 ```
 
 ### `delete` command
