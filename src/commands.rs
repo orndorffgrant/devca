@@ -105,30 +105,43 @@ pub(crate) fn ls() -> Result<(), String> {
     Ok(())
 }
 
-pub(crate) fn path_to(name: &str) -> Result<(), String> {
-    if name == RESERVED_CA_NAME {
-        let dir = ca_dir()?;
-        if dir.exists() {
-            println!("{}", dir.to_str().ok_or("error converting directory name")?);
-            Ok(())
-        } else {
-            Err(
-                "Certificate Authority has not been created yet. It will be created when you create a new cert with \"devca new\".".to_string()
-            )
-        }
-    } else {
-        let mut dir = certs_dir()?;
-        dir.push(name);
-        if dir.exists() {
-            println!("{}", dir.to_str().ok_or("error converting directory name")?);
-            Ok(())
-        } else {
-            Err(format!(
-                "Certificate with that name has not been created. Create it with \"devca new {}\".",
-                name
-            ))
-        }
+pub(crate) fn path_to(name: &str, cert: bool, key: bool) -> Result<(), String> {
+    if cert && key {
+        return Err("Cannot combine --cert and --key flags".to_string())
     }
+
+    let mut dir = {
+        if name == RESERVED_CA_NAME {
+            let dir = ca_dir()?;
+            if dir.exists() {
+                dir
+            } else {
+                return Err(
+                    "Certificate Authority has not been created yet. It will be created when you create a new cert with \"devca new\".".to_string()
+                )
+            }
+        } else {
+            let mut dir = certs_dir()?;
+            dir.push(name);
+            if dir.exists() {
+                dir
+            } else {
+                return Err(format!(
+                    "Certificate with that name has not been created. Create it with \"devca new {}\".",
+                    name
+                ))
+            }
+        }
+    };
+    
+    if cert {
+        dir.push("cert.pem");
+    } else if key {
+        dir.push("key.pem");
+    }
+
+    println!("{}", dir.to_str().ok_or("error converting directory name")?);
+    Ok(())
 }
 
 pub(crate) fn delete(name: &str) -> Result<(), String> {
