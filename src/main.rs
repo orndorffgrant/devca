@@ -29,8 +29,24 @@ struct NewCommand {
 }
 
 #[derive(Clap)]
+#[clap(about = "Prints absolute path to a generated cert or key")]
 struct PathToCommand {
+    #[clap(
+        about = "Name of the cert to print the absolute path of. If neither --cert nor --key is passed, the directory containing the cert is printed."
+    )]
     name: String,
+    #[clap(
+        short,
+        long,
+        about = "Prints path to the cert file. Cannot be combined with --key."
+    )]
+    cert: bool,
+    #[clap(
+        short,
+        long,
+        about = "Prints path to the key file. Cannot be combined with --cert."
+    )]
+    key: bool,
 }
 
 #[derive(Clap)]
@@ -48,7 +64,7 @@ fn run() -> Result<(), String> {
             commands::ls()?;
         }
         SubCommand::PathTo(p) => {
-            commands::path_to(&p.name)?;
+            commands::path_to(&p.name, p.cert, p.key)?;
         }
         SubCommand::Delete(d) => {
             commands::delete(&d.name)?;
