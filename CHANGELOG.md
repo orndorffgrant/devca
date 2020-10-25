@@ -1,3 +1,13 @@
+# [0.3.0](https://github.com/orndorffgrant/devca/compare/v0.2.0...v0.3.0) (2020-10-25)
+
+
+### Features
+
+* cert and key flags for path-to command ([#24](https://github.com/orndorffgrant/devca/issues/24)) ([ac51dd8](https://github.com/orndorffgrant/devca/commit/ac51dd89ef29c10866a78b8aeb7afbb4e77a18c5))
+* support `path-to ca` ([#23](https://github.com/orndorffgrant/devca/issues/23)) ([ab8134f](https://github.com/orndorffgrant/devca/commit/ab8134fc4b6328684220fe4fe07e0c09c4bf7176))
+
+
+
 # [0.2.0](https://github.com/orndorffgrant/devca/compare/54c4ac7f076ef56b2bbd7d03f25344737d6ae8ca...v0.2.0) (2020-10-08)
 
 
