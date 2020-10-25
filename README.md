@@ -146,7 +146,6 @@ $ devca path-to localhost --key
 /home/grant/.local/share/devca/certs/localhost/key.pem
 ```
 
-
 If the cert doesn't exist, nothing will be printed to `stdout` and `devca` will exit with a non-zero exit code.
 
 You can use this instead of memorizing the location of the certs and keys themselves. For example, when using `npx serve`:

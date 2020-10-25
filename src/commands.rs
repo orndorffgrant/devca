@@ -59,7 +59,7 @@ fn get_cert_list() -> Result<Vec<String>, String> {
 
 pub(crate) fn new_cert(name: &str, force_overwrite: bool) -> Result<(), String> {
     if name == RESERVED_CA_NAME {
-        return Err(format!("Refusing to create certificate.\n\"{}\" is reserved so that you can use commands like \"devca path-to {}\".", RESERVED_CA_NAME, RESERVED_CA_NAME))
+        return Err(format!("Refusing to create certificate.\n\"{}\" is reserved so that you can use commands like \"devca path-to {}\".", RESERVED_CA_NAME, RESERVED_CA_NAME));
     };
 
     let (ca_cert_pem, ca_key_pem) = get_ca(false)?;
@@ -107,7 +107,7 @@ pub(crate) fn ls() -> Result<(), String> {
 
 pub(crate) fn path_to(name: &str, cert: bool, key: bool) -> Result<(), String> {
     if cert && key {
-        return Err("Cannot combine --cert and --key flags".to_string())
+        return Err("Cannot combine --cert and --key flags".to_string());
     }
 
     let mut dir = {
@@ -118,7 +118,7 @@ pub(crate) fn path_to(name: &str, cert: bool, key: bool) -> Result<(), String> {
             } else {
                 return Err(
                     "Certificate Authority has not been created yet. It will be created when you create a new cert with \"devca new\".".to_string()
-                )
+                );
             }
         } else {
             let mut dir = certs_dir()?;
@@ -129,11 +129,11 @@ pub(crate) fn path_to(name: &str, cert: bool, key: bool) -> Result<(), String> {
                 return Err(format!(
                     "Certificate with that name has not been created. Create it with \"devca new {}\".",
                     name
-                ))
+                ));
             }
         }
     };
-    
+
     if cert {
         dir.push("cert.pem");
     } else if key {

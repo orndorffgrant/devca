@@ -47,8 +47,7 @@ fn to_writable_bytes(cert: Cert, key: PrivateKey) -> Result<(Vec<u8>, Vec<u8>), 
 }
 
 pub(crate) fn create_ca() -> Result<(Vec<u8>, Vec<u8>), String> {
-    let private_key =
-        PrivateKey::generate_rsa(2048).map_err(stringify)?;
+    let private_key = PrivateKey::generate_rsa(2048).map_err(stringify)?;
 
     let (valid_from, valid_to) = validity_range().map_err(stringify)?;
 
