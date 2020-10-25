@@ -6,6 +6,8 @@ use std::fs::{read, remove_dir_all, write};
 use std::io;
 use std::io::prelude::*;
 
+const RESERVED_CA_NAME: &'static str = "ca";
+
 fn get_ca(force_create_new: bool) -> Result<(Vec<u8>, Vec<u8>), String> {
     let mut key_path = ca_dir()?;
     let mut cert_path = key_path.clone();
@@ -56,6 +58,10 @@ fn get_cert_list() -> Result<Vec<String>, String> {
 }
 
 pub(crate) fn new_cert(name: &str, force_overwrite: bool) -> Result<(), String> {
+    if name == RESERVED_CA_NAME {
+        return Err(format!("Refusing to create certificate.\n\"{}\" is reserved so that you can use commands like \"devca path-to {}\".", RESERVED_CA_NAME, RESERVED_CA_NAME))
+    };
+
     let (ca_cert_pem, ca_key_pem) = get_ca(false)?;
 
     let mut key_path = cert_dir(name)?;
@@ -100,16 +106,28 @@ pub(crate) fn ls() -> Result<(), String> {
 }
 
 pub(crate) fn path_to(name: &str) -> Result<(), String> {
-    let mut dir = certs_dir()?;
-    dir.push(name);
-    if dir.exists() {
-        println!("{}", dir.to_str().ok_or("error converting directory name")?);
-        Ok(())
+    if name == RESERVED_CA_NAME {
+        let dir = ca_dir()?;
+        if dir.exists() {
+            println!("{}", dir.to_str().ok_or("error converting directory name")?);
+            Ok(())
+        } else {
+            Err(
+                "Certificate Authority has not been created yet. It will be created when you create a new cert with \"devca new\".".to_string()
+            )
+        }
     } else {
-        Err(format!(
-            "Certificate with that name has not been created. Create it with \"devca new {}\"",
-            name
-        ))
+        let mut dir = certs_dir()?;
+        dir.push(name);
+        if dir.exists() {
+            println!("{}", dir.to_str().ok_or("error converting directory name")?);
+            Ok(())
+        } else {
+            Err(format!(
+                "Certificate with that name has not been created. Create it with \"devca new {}\".",
+                name
+            ))
+        }
     }
 }
 
