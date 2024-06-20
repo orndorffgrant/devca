@@ -1,0 +1,30 @@
+name: devca
+base: core24
+version: '0.3.0'
+summary: Easily generate certificates for developing services locally over TLS
+description: |
+  devca is a command to easily generate certificates for local TLS services
+  during development. Client applications, particularly browsers, behave
+  differently when connecting to plaintext services (like HTTP) compared to
+  secure services (like HTTPS). By creating certificates for your local
+  in-development services, you can develop your services in a more similar
+  environment to a real deployment.
+
+grade: stable
+confinement: strict
+
+platforms:
+  amd64:
+
+parts:
+  devca:
+    plugin: rust
+    source-type: git
+    source: https://github.com/orndorffgrant/devca
+
+apps:
+  devca:
+    command: bin/devca
+    environment:
+      DEVCA_HOME: /var/snap/devca/common
+
