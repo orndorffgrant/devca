@@ -12,6 +12,12 @@
 
 ## Installation
 
+### Via snap
+
+```
+snap install devca
+```
+
 ### Pre-built WebAssembly Binary
 
 WebAssembly builds are included in each [release](https://github.com/orndorffgrant/devca/releases/latest).
